@@ -1,5 +1,9 @@
 ---
 # tasks file for mongodb-install
+- name: 输出变量值
+  debug:
+    msg: "mongo_install_path: {{ mongo_install_path }}, mongo_replica_set_name: {{ mongo_replica_set_name }}, mongo_port: {{ mongo_port }}"
+
 - name: 检查系统是否已安装MongoDB
   shell: "{{ mongo_install_path }}/mongodb/bin/mongod --version"
   register: mongo_installed
