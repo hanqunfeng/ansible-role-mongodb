@@ -54,8 +54,8 @@
   shell: yum install gcc -y
   when: gcc_status.rc != 0
 
-- name: 判断是否安装了perl-FindBin
-  shell: rpm -q perl-FindBin
+- name: 判断是否安装了perl-devel
+  shell: rpm -q perl-devel
   register: perl_status
   ignore_errors: yes
 
