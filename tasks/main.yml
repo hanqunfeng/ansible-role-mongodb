@@ -76,7 +76,6 @@
     chdir: "{{ mongo_install_path }}"
   when: not file_stat.stat.exists
 
-
 - name: 检查系统是否已启动mongo
   shell: ps aux | grep mongo | grep -v grep
   register: mongo_status
@@ -87,3 +86,25 @@
   when: mongo_status.rc != 0
   notify:
     - mongo start
+
+- name: 设置环境变量
+  lineinfile:
+    path: /etc/profile
+    line: "{{ item }}"
+    state: present
+  loop:
+    - "export MONGODB_HOME={{ mongo_install_path }}/mongodb"
+    - "PATH=$PATH:$MONGODB_HOME/bin"
+
+- name: 检查系统是否已安装MongoShell
+  shell: "mongosh --version"
+  register: mongosh_installed
+  ignore_errors: yes
+
+- name: mongosh install
+  shell:
+    cmd: |
+      wget https://downloads.mongodb.com/compass/mongodb-mongosh-{{ mongosh_version }}.x86_64.rpm
+      yum install -y mongodb-mongosh-{{ mongosh_version }}.x86_64.rpm
+    chdir: "{{ mongo_install_path }}"
+  when: mongosh_installed.rc != 0
