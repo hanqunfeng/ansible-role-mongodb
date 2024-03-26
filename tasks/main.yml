@@ -1,0 +1,85 @@
+---
+# tasks file for mongodb-install
+- name: 检查系统是否已安装MongoDB
+  shell: "{{ mongo_install_path }}/mongodb/bin/mongod --version"
+  register: mongo_installed
+  ignore_errors: yes
+
+- name: 判断是否存在mongo安装目录，不存在就创建
+  file:
+    path: "{{ mongo_install_path }}"
+    state: directory
+  when: mongo_installed.rc != 0  # 只有当mongo未安装时执行
+
+- name: mongo install
+  shell:
+    cmd: |
+      wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel80-{{ mongo_version }}.tgz
+      tar -zxvf mongodb-linux-x86_64-rhel80-{{ mongo_version }}.tgz
+      ln -s mongodb-linux-x86_64-rhel80-{{ mongo_version }} mongodb
+      mkdir -p {{ mongo_directory }}/data {{ mongo_directory }}/log
+    chdir: "{{ mongo_install_path }}"
+  when: mongo_installed.rc != 0
+
+- name: 上传mongo配置文件
+  template:
+    src: "mongo.conf"
+    dest: "{{ mongo_directory }}/mongo.conf"
+    force: true # 强制覆盖
+    backup: true # 覆盖前备份
+  when: mongo_installed.rc != 0
+
+- name: 上传mongo复制集keyFile
+  copy:
+    src: "mongo.key"
+    dest: "{{ mongo_directory }}/mongo.key"
+    mode: 0600
+  when: mongo_installed.rc != 0
+
+- name: 检查mongo依赖的openssl库文件是否存在
+  stat:
+    path: /usr/lib64/libcrypto.so.1.1
+  register: file_stat
+
+- name: 判断是否安装了gcc
+  shell: rpm -q gcc
+  register: gcc_status
+  ignore_errors: yes
+
+- name: 安装gcc
+  shell: yum install gcc -y
+  when: gcc_status.rc != 0
+
+- name: 判断是否安装了perl-FindBin
+  shell: rpm -q perl-FindBin
+  register: perl_status
+  ignore_errors: yes
+
+- name: 安装perl-devel
+  shell: yum install perl-FindBin perl-devel perl-Pod-Html -y
+  when: perl_status.rc != 0
+
+- name: mongo依赖的openssl库文件不存在则需要安装
+  shell:
+    cmd: |
+      wget  https://www.openssl.org/source/openssl-1.1.1w.tar.gz
+      tar -zxvf openssl-1.1.1w.tar.gz
+      cd openssl-1.1.1w
+      ./config
+      make && make install
+      ln -s /usr/local/lib64/libcrypto.so.1.1 /usr/lib64/libcrypto.so.1.1
+      ln -s /usr/local/lib64/libssl.so.1.1 /usr/lib64/libssl.so.1.1
+    chdir: "{{ mongo_install_path }}"
+  when: not file_stat.stat.exists
+
+
+- name: 检查系统是否已启动mongo
+  shell: ps aux | grep mongo | grep -v grep
+  register: mongo_status
+  ignore_errors: yes
+
+- name: 检查是否需要启动mongo
+  shell: echo "start mongo"
+  when: mongo_status.rc != 0
+  notify:
+    - mongo start

@@ -1,0 +1,5 @@
+---
+- hosts: test-mongo
+  become: yes  # 切换到root用户下执行
+  roles:
+    - mongodb-install

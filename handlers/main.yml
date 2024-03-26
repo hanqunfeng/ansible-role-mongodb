@@ -1,0 +1,12 @@
+---
+# handlers file for mongodb-install
+- name: mongo start
+  shell:
+    cmd: "{{ mongo_install_path }}/mongodb/bin/mongod -f /mongodb/mongo.conf"
+
+- name: mongo restart
+  shell:
+    cmd: |
+      "{{ mongo_install_path }}/mongodb/bin/mongod -f /mongodb/mongo.conf --shutdown"
+      sleep 10
+      "{{ mongo_install_path }}/mongodb/bin/mongod -f /mongodb/mongo.conf"
