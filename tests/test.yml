@@ -1,7 +1,5 @@
 ---
 - hosts: test-mongo
   become: yes  # 切换到root用户下执行
-  vars:
-    mongo_install_path: /usr/local/soft_new
   roles:
-    - mongodb-install
+    - hanqunfeng.mongodb-install
