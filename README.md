@@ -12,9 +12,13 @@ Role Variables
 --------------
 ```yml
 # vars file for mongodb-install
+# mongodb安装路径
 mongo_install_path: /usr/local/soft
+# mongodb版本
 mongo_version: 7.0.6
+# 复制集名称
 mongo_replica_set_name: rs0
+# mongodb端口
 mongo_port: 27017
 # 数据、日志、配置文件、keyFile存储路径
 mongo_directory: /mongodb
