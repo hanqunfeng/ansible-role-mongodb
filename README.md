@@ -30,7 +30,7 @@ Including an example of how to use your role (for instance, with variables passe
 - hosts: mongo-servers
   become: yes  # 切换到root用户下执行
   roles:
-    - mongodb-install
+    - hanqunfeng.mongodb-install
 ```
 
 License
