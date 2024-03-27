@@ -102,7 +102,7 @@
     - mongo start
 
 - name: 检查系统是否已安装MongoShell
-  shell: "mongosh --version"
+  shell: "{{ mongo_install_path }}/mongosh/bin/mongosh --version"
   register: mongosh_installed
   ignore_errors: yes
 
