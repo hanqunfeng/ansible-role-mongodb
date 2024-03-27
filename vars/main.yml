@@ -1,10 +1,10 @@
 ---
 # vars file for mongodb-install
 mongo_install_path: /usr/local/soft
-mongo_version: 7.0.6
+mongo_version: 7.0.7
 mongo_replica_set_name: rs0
 mongo_port: 27017
 # 数据、日志、配置文件、keyFile存储路径
 mongo_directory: /mongodb
 # mongosh version
-mongosh_version: 2.1.5
+mongosh_version: 2.2.2

@@ -87,15 +87,6 @@
   notify:
     - mongo start
 
-- name: 设置环境变量
-  lineinfile:
-    path: /etc/profile
-    line: "{{ item }}"
-    state: present
-  loop:
-    - "export MONGODB_HOME={{ mongo_install_path }}/mongodb"
-    - "PATH=$PATH:$MONGODB_HOME/bin"
-
 - name: 检查系统是否已安装MongoShell
   shell: "mongosh --version"
   register: mongosh_installed
@@ -104,7 +95,18 @@
 - name: mongosh install
   shell:
     cmd: |
-      wget https://downloads.mongodb.com/compass/mongodb-mongosh-{{ mongosh_version }}.x86_64.rpm
-      yum install -y mongodb-mongosh-{{ mongosh_version }}.x86_64.rpm
+      wget https://downloads.mongodb.com/compass/mongosh-{{ mongosh_version }}-linux-x64-openssl11.tgz
+      tar -zxvf mongosh-{{ mongosh_version }}-linux-x64-openssl11.tgz
+      ln -s mongosh-{{ mongosh_version }}-linux-x64-openssl11 mongosh
     chdir: "{{ mongo_install_path }}"
   when: mongosh_installed.rc != 0
+
+- name: 设置环境变量
+  lineinfile:
+    path: /etc/profile
+    line: "{{ item }}"
+    state: present
+  loop:
+    - "export MONGODB_HOME={{ mongo_install_path }}/mongodb"
+    - "export MONGODB_SHELL_HOME={{ mongo_install_path }}/mongosh"
+    - "PATH=$PATH:$MONGODB_HOME/bin:$MONGODB_SHELL_HOME/bin"
