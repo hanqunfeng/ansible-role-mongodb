@@ -1,5 +1,19 @@
 ---
 # tasks file for mongodb-install
+- name: Print remote host IP address
+  debug:
+    # 获取 ansible_facts中的属性时，不需要加上 ansible_ 前缀
+    msg: "Remote host IP address: {{ ansible_host }},  Run User: {{ ansible_facts['user_id'] }}"
+
+- name: Print remote host operating system information
+  debug:
+    msg: "Remote host operating system: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}"
+
+- name: Check if running as root
+  fail:
+    msg: "This role must be run as root user"
+  when: ansible_facts['user_id'] != 'root'
+
 - name: 输出变量值
   debug:
     msg: "mongo_install_path: {{ mongo_install_path }}, mongo_replica_set_name: {{ mongo_replica_set_name }}, mongo_port: {{ mongo_port }}"
