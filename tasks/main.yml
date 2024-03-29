@@ -5,6 +5,15 @@
     # 获取 ansible_facts中的属性时，不需要加上 ansible_ 前缀
     msg: "Remote host IP address: {{ ansible_host }},  Run User: {{ ansible_facts['user_id'] }}"
 
+- name: test hostvars
+  debug: # 如果只是为了测试变量是否正确，此处可以修改为 fail
+    # msg: "{{ groups[group_names[0]] | difference([inventory_hostname]) }}" # difference([inventory_hostname]) 去除自己
+    msg: "IP: {{ item }}, hostname: {{ hostvars[item].hostname | default('mongodb.db' ~ index) }}"
+    # msg: "IP: {{ item }}, hostname: {{ index }}"
+  loop: "{{ groups[group_names[0]] }}"
+  loop_control:
+    index_var: index
+
 - name: Print remote host operating system information
   debug:
     msg: "Remote host operating system: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}"
@@ -17,6 +26,17 @@
 - name: 输出变量值
   debug:
     msg: "mongo_install_path: {{ mongo_install_path }}, mongo_replica_set_name: {{ mongo_replica_set_name }}, mongo_port: {{ mongo_port }}"
+
+
+- name: Set static hostname in /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ item }} {{ hostvars[item].hostname | default('mongodb.db' ~ index) }}"
+    state: present
+  loop: "{{ groups[group_names[0]] }}"
+  loop_control:
+    index_var: index
+
 
 - name: 检查系统是否已安装MongoDB
   shell: "{{ mongo_install_path }}/mongodb/bin/mongod --version"

@@ -39,6 +39,14 @@ Including an example of how to use your role (for instance, with variables passe
     - hanqunfeng.mongodb-install
 ```
 
+inventory
+```
+[mongo-servers]
+10.1.2.249 hostname=mongodb.db03
+10.1.2.184 hostname=mongodb.db02
+10.1.2.178 hostname=mongodb.db01
+```
+
 License
 -------
 
